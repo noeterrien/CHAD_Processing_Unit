@@ -120,6 +120,9 @@ void FrameProcessor::computeTranslation(FrameProcessor fp1, FrameProcessor fp2,
 		dxs.push_back( fp2.keypoints[match -> trainIdx].pt.x - fp1.keypoints[match -> queryIdx].pt.x );
 		dys.push_back( fp2.keypoints[match -> trainIdx].pt.y - fp1.keypoints[match -> queryIdx].pt.y );
 	}
+	if (dxs.empty()) {return;}
+	if (dys.empty()) {return;}
+
 	dx = median(dxs); dy = median(dys);
 
 
@@ -128,6 +131,7 @@ void FrameProcessor::computeTranslation(FrameProcessor fp1, FrameProcessor fp2,
 	for (auto match=begin(matches); match != end(matches); ++match) {
 		dzs.push_back( fp2.keypoints_red_component[match -> trainIdx] - fp1.keypoints_red_component[match -> queryIdx] );
 	}
+	if (dzs.empty()) return;
 	dz = median(dzs);
 }
 

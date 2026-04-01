@@ -13,7 +13,8 @@
 int main()
 {
     std::string CAMSET = "udpsrc port=5600 ! application/x-rtp,media=video,encoding-name=H264 !  rtph264depay ! avdec_h264 ! videoconvert ! appsink";
-
+    //std::string CAMSET = "tests/test_video.mp4";
+    
     Camera cam1(CAMSET);
     //Camera cam1("tests/test_video.mp4");
     cam1.start();
@@ -25,14 +26,17 @@ int main()
     FrameProcessor *fp_ref(0), *fp(0);
     cv::Mat frame_with_keypoints;
 
-    float dx, dy, dz;
+    float dx(0), dy(0), dz(0);
 
     Sender this_to_ROV("192.168.2.2", 1106);
+    
+    std::cout << "YAY" << std::endl;
 
     while (true) {
 
         if (cam1.is_new_frame_available())
         {
+            float dx(0), dy(0), dz(0);
             // extract new frame and display it
             {
                 // extract new frame  
