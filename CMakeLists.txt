@@ -11,7 +11,7 @@ add_executable(CPU)
 target_sources(CPU
     PRIVATE
         main.cpp
-        utilitaries.cpp)
+        libraries/utilitaries.cpp)
 target_compile_features(CPU 
     PRIVATE 
         cxx_std_17)
@@ -29,23 +29,27 @@ target_link_libraries(CPU
 add_library(Display)
 target_sources(Display
     PRIVATE
-        Display.cpp
+        libraries/Display.cpp
         
     PUBLIC
         FILE_SET HEADERS
+        BASE_DIRS 
+            libraries
         FILES
-            Display.hpp)
+            libraries/Display.hpp)
 
             
 add_library(Camera)
 target_sources(Camera
     PRIVATE
-        Camera.cpp
+        libraries/Camera.cpp
 
     PUBLIC
         FILE_SET HEADERS
+        BASE_DIRS 
+            libraries
         FILES
-            Camera.hpp
+            libraries/Camera.hpp
 )
 target_link_libraries(Camera
     PRIVATE
@@ -56,12 +60,14 @@ target_link_libraries(Camera
 add_library(FrameProcessor)
 target_sources(FrameProcessor
     PRIVATE
-        FrameProcessor.cpp
+        libraries/FrameProcessor.cpp
 
     PUBLIC
         FILE_SET HEADERS
+        BASE_DIRS 
+            libraries
         FILES
-            FrameProcessor.hpp
+            libraries/FrameProcessor.hpp
 )
 target_link_libraries(FrameProcessor
     PUBLIC
@@ -72,9 +78,11 @@ target_link_libraries(FrameProcessor
 add_library(Interface)
 target_sources(Interface
     PRIVATE
-        Interface.cpp
+        libraries/Interface.cpp
         
     PUBLIC
         FILE_SET HEADERS
+        BASE_DIRS 
+            libraries
         FILES
-            Interface.hpp)
+            libraries/Interface.hpp)
