@@ -5,7 +5,7 @@
 #include <thread>
 #include <mutex>
 
-Camera::Camera(std::string src) : new_frame_available(false)
+Camera::Camera(std::string src, cv::Mat *frame, std::mutex *lock_frame) : new_frame_available(false), current_frame(frame), lock_frame(lock_frame)
 {
 
     std::cout << "Attempting to fetch signal from source " << src << std::endl;
@@ -15,17 +15,16 @@ Camera::Camera(std::string src) : new_frame_available(false)
     {
 		std::cout << "Camera started from source" << src << std::endl;
         stream_opened = true;
-        current_frame = new cv::Mat;
 	} else 
     {
-		std::cerr << "Could not open camera from source" << std::endl;
+		std::cerr << "Could not open camera from source" << src << std::endl;
         stream_opened = false;
         exit(EXIT_FAILURE);
 	}
 
 }
 
-Camera::Camera(std::string ip_address, std::string port) : Camera(ip_address + ":" + port) {};
+Camera::Camera(std::string ip_address, std::string port, cv::Mat *frame, std::mutex *lock_frame) : Camera(ip_address + ":" + port, frame, lock_frame) {};
 
 void Camera::start() {
     if (stream_opened) 
@@ -39,25 +38,19 @@ void Camera::start() {
     }
 }
 
-Camera::~Camera() { delete current_frame; }
-
 void Camera::run()
 {
     cv::Mat frame_temp;
 	while (stream_opened) {
 		bool new_frame_temp_available = stream.read(frame_temp);
         {
-            std::lock_guard<std::mutex> guard(lock_frame); // prevents copy if frame is being processed
+            std::lock_guard<std::mutex> guard(*lock_frame); // prevents copy if frame is being processed
             frame_temp.copyTo(*current_frame);
             new_frame_available = new_frame_temp_available;
         }
 	}
 }
 
-cv::Mat *Camera::get_current_frame() 
-{
-    new_frame_available = false;
-    return current_frame;
-}
+void Camera::set_new_frame_available_status(bool still_considered_new) { new_frame_available = still_considered_new; }
 
 bool Camera::is_new_frame_available() { return new_frame_available; }

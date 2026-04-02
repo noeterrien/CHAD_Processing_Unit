@@ -10,6 +10,17 @@ To compile the CHAD Processing Unit (CPU), you will need the following dependenc
 
 std::cout << cv::getBuildInformation() << std::endl;
 ```
+In case you need to rebuild OpenCV with GSTREAMER libraries enabled, use the following commands (from OpenCV repository) :
+```
+cmake -D WITH_GSTREAMER=ON \
+      -D WITH_FFMPEG=ON \  # optional if you want only GStreamer
+      -D CMAKE_BUILD_TYPE=Release \
+      -D CMAKE_INSTALL_PREFIX=/usr/local \
+      ..
+
+make -j$(nproc)
+sudo make install
+```
 
 * <u>cpp-mjpeg-streamer</u> : nadjieb' cpp-mjpeg-streamer is used to display camera in a browser in real time. To install, do :
 ```
