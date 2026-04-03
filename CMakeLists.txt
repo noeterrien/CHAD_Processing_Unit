@@ -17,7 +17,6 @@ target_compile_features(CPU
         cxx_std_17)
 target_link_libraries(CPU 
     PRIVATE 
-        nadjieb_mjpeg_streamer::nadjieb_mjpeg_streamer
         ${OpenCV_LIBS}
         Display
         Camera

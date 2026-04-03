@@ -20,10 +20,13 @@ public:
 																											   translation is being computed, as long as keypoints
 																											   and descriptors have already been computed*/
 	
+	// methods for debug
 	void frame_safeLock(); // copies the associated frame so that it cannot be modified by another thread (for DEBUG purposes)
+	size_t get_numberOfKeypoints();
 
 	// methods for display
 	void drawKeypoints(cv::Mat &outFrame);
+
 
 private :
 	cv::Mat *frame;
@@ -31,7 +34,7 @@ private :
 
 	cv::Mat *mask; // a mask to use only part of the frame
 	std::vector<cv::KeyPoint> keypoints; // a KeyPoint as Point2f attribute pt from which we can extract x and y attributes
-	cv::Mat descriptors; // descriptors of keypoints. Index in keypoints vector corresponds to first index of descriptors
+	cv::Mat descriptors; // descriptors of keypoints. Index in keypoints vector corresponds to index of descriptors
 	std::vector<uint8_t> keypoints_red_component; // red_channel == 0 or 255 indicates saturation. In that case, keypoint should not be used
 
 	cv::Ptr<cv::SiftFeatureDetector> sift;

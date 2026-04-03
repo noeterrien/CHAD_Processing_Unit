@@ -142,3 +142,5 @@ void FrameProcessor::frame_safeLock() {
 	frame = new cv::Mat(frame -> clone());
 	frameCopied = true;
 }
+
+size_t FrameProcessor::get_numberOfKeypoints() { return descriptors.total(); }

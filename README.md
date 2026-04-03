@@ -37,3 +37,13 @@ cmake ../;
 make;
 sudo make install;
 ```
+
+* <u> cpp-httplib </u> : this library is used to communicate with the CHAD Processing Unit via http request (usually using cockpit). To install, do :
+```
+git clone https://github.com/yhirose/cpp-httplib.git
+cd cpp-httplib
+mkdir build && cd build
+cmake ../
+make 
+sudo make install
+```

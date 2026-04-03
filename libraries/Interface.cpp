@@ -4,6 +4,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include <httplib.h>
 
 Sender::Sender(std::string ip_address, uint16_t port) {
     address.sin_family = AF_INET;

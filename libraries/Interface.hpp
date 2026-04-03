@@ -1,14 +1,13 @@
-#ifndef DEF_SOCKET
-#define DEF_SOCKET
+#ifndef DEF_INTERFACE
+#define DEF_INTERFACE
 
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string>
+#include <httplib.h>
 
-/*The instances defined in this class use IPv4 (AF_INET) and UDP protocol (SOCK_DGRAM)*/
-
-/*An instance to send messages to an address*/
+/*An instance to send messages to an address using use IPv4 (AF_INET) and UDP protocol (SOCK_DGRAM)*/
 class Sender {
 
 public:
