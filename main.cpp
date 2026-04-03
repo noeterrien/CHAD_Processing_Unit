@@ -37,16 +37,17 @@ int main()
     Sender this_to_ROV("192.168.2.2", 1106);
 
     // http requests handling interface initialization
-    httplib::Server incoming_requests_handler;
+    HTTPServer incoming_requests_handler;
     incoming_requests_handler.Post("/reset_reference_frame", [&](const httplib::Request& req, httplib::Response& res){ // define reset_reference_frame post request
         if (fp_ref != 0) {
             delete fp_ref; 
             fp_ref = 0;
             std::cout << "Deleted reference frame" << std::endl;
         }
+        res.set_header("Access-Control-Allow-Origin", "*");
         res.set_content("Reference frame reset", "text/plain");
     });
-    incoming_requests_handler.listen("0.0.0.0", 8080); // listen from all IPs on port 8080
+    incoming_requests_handler.start(8000); // listen from all IPs on port 8080
 
     ////////////////////////////////////////////////////   PROCESSING   //////////////////////////////////////////////////////////
 
@@ -65,7 +66,12 @@ int main()
                 std::cout << "number of keypoints : " << fp->get_numberOfKeypoints() << std::endl;
         
                 // set reference frame
-                if (fp_ref == 0) { fp_ref = new FrameProcessor(*fp); fp_ref->frame_safeLock(); std::cout << "Reference frame set : number of keypoints = " << fp_ref->get_numberOfKeypoints() << std::endl;} 
+                if (fp_ref == 0) 
+                { 
+                    fp_ref = new FrameProcessor(*fp); 
+                    fp_ref->frame_safeLock(); 
+                    std::cout << "Reference frame set : number of keypoints = " << fp_ref->get_numberOfKeypoints() << std::endl;
+                } 
 
                 // DEBUG : safelock frame
                 fp->frame_safeLock();
