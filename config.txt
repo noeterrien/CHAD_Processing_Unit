@@ -1,0 +1,13 @@
+# when a '#' caracter is used, the rest of the line is ignored
+# format is name_with_no_spaces=value
+# config for initialization
+source=tests/test_video.mp4# for reading mp4 video
+# to read camera from ROV, use :
+# source=udpsrc port=5600 ! application/x-rtp,media=video,encoding-name=H264 !  rtph264depay ! avdec_h264 ! videoconvert ! appsink 
+rov_ip=192.168.2.2
+rov_send_port=1106
+cockpit_reset_reference_port=8080
+# gains (should be calibrated before using CHAD_mode)
+gainX=1
+gainY=1
+gainZ=1

@@ -21,7 +21,8 @@ target_link_libraries(CPU
         Display
         Camera
         FrameProcessor
-        Interface    
+        Interface  
+        Parameters  
 )
 
 
@@ -85,3 +86,15 @@ target_sources(Interface
             libraries
         FILES
             libraries/Interface.hpp)
+
+add_library(Parameters)
+target_sources(Parameters
+    PRIVATE
+        libraries/Parameters.cpp
+        
+    PUBLIC
+        FILE_SET HEADERS
+        BASE_DIRS 
+            libraries
+        FILES
+            libraries/Parameters.hpp)
