@@ -5,6 +5,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <httplib.h>
+#include <iostream>
 
 Sender::Sender(std::string ip_address, uint16_t port) {
     address.sin_family = AF_INET;
@@ -22,4 +23,14 @@ void Sender::sendVector(float x, float y, float z)
 {   
     float vector[3] = {x, y, z};
     sendto(_socket, &vector, sizeof(vector), MSG_DONTWAIT, (const sockaddr*) &address, size);
+}
+
+void HTTPServer::start(uint16_t port, std::string address) {
+    std::thread thread([=]{ 
+        std::cout << "starting http server on " << address << ":" << port << std::endl;
+
+        int ret = listen(address, port);
+    });
+    thread.detach();
+    std::cout << "started HTTP server, waiting for incoming requests" << std::endl;
 }

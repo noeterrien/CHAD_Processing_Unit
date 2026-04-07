@@ -6,7 +6,7 @@ source=tests/test_video.mp4# for reading mp4 video
 # source=udpsrc port=5600 ! application/x-rtp,media=video,encoding-name=H264 !  rtph264depay ! avdec_h264 ! videoconvert ! appsink 
 rov_ip=192.168.2.2
 rov_send_port=1106
-cockpit_reset_reference_port=8080
+cockpit_reset_reference_port=8000
 # gains (should be calibrated before using CHAD_mode)
 gainX=1
 gainY=1

@@ -42,7 +42,7 @@ int main()
     Sender this_to_ROV(params.rov_ip, params.rov_send_port);
 
     // http requests handling interface initialization
-    httplib::Server incoming_requests_handler;
+    HTTPServer incoming_requests_handler;
     incoming_requests_handler.Post("/reset_reference_frame", [&](const httplib::Request& req, httplib::Response& res){ // define reset_reference_frame post request
         if (fp_ref != 0) {
             std::lock_guard<std::mutex> guard(lock_reference_frame_processor);
@@ -50,9 +50,10 @@ int main()
             fp_ref = 0;
             std::cout << "Deleted reference frame" << std::endl;
         }
+        res.set_header("Access-Control-Allow-Origin", "*");
         res.set_content("Reference frame reset", "text/plain");
     });
-    incoming_requests_handler.listen("0.0.0.0", params.cockpit_reset_reference_port); // listen from all IPs on port 8080
+    incoming_requests_handler.start(params.cockpit_reset_reference_port); // listen from all IPs on port 8080
 
     ////////////////////////////////////////////////////   PROCESSING   //////////////////////////////////////////////////////////
 
