@@ -24,7 +24,7 @@ Parameters::Parameters(string path) {
             for ( int i = 0; i < line.size(); i++) 
             {   
                 if (line[i] == '#') break; // ignore the rest of the line
-                if (line[i] == '=') reading_value=true;
+                if (line[i] == ':') reading_value=true;
                 else {
                     key_value[reading_value].push_back(line[i]); 
                 }
