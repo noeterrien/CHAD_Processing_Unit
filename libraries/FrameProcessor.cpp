@@ -107,13 +107,12 @@ void FrameProcessor::matchKeypoints(FrameProcessor fp1, FrameProcessor fp2, std:
 dx corresponds to the camera's horizontal axis, from left to right and dy to the camera's vertical axis from top to bottom.
 dz is given in red channel intensity (between 0 and 255). If dz > 0, the camera got closer to the object in front (higher red intensity)
 Assumes changes of attitude to be negligeable.*/
-void FrameProcessor::computeTranslation(FrameProcessor fp1, FrameProcessor fp2, 
-										float &dx, float &dy, float &dz, int &m_kp_num) {
+int FrameProcessor::computeTranslation(FrameProcessor fp1, FrameProcessor fp2, 
+										float &dx, float &dy, float &dz) {
 
 	// matching keypoints
 	std::vector<cv::DMatch> matches;
 	FrameProcessor::matchKeypoints(fp1, fp2, matches);
-	m_kp_num = matches.size();
 
 	// computing x, y translation by looking at median translation for each keypoint
 	std::vector<float> dxs, dys;
@@ -121,8 +120,8 @@ void FrameProcessor::computeTranslation(FrameProcessor fp1, FrameProcessor fp2,
 		dxs.push_back( fp2.keypoints[match -> trainIdx].pt.x - fp1.keypoints[match -> queryIdx].pt.x );
 		dys.push_back( fp2.keypoints[match -> trainIdx].pt.y - fp1.keypoints[match -> queryIdx].pt.y );
 	}
-	if (dxs.empty()) {return;}
-	if (dys.empty()) {return;}
+	if (dxs.empty()) {return 0;}
+	if (dys.empty()) {return 0;}
 
 	dx = median(dxs); dy = median(dys);
 
@@ -132,8 +131,10 @@ void FrameProcessor::computeTranslation(FrameProcessor fp1, FrameProcessor fp2,
 	for (auto match=begin(matches); match != end(matches); ++match) {
 		dzs.push_back( fp2.keypoints_red_component[match -> trainIdx] - fp1.keypoints_red_component[match -> queryIdx] );
 	}
-	if (dzs.empty()) return;
+	if (dzs.empty()) return 0;
 	dz = median(dzs);
+	
+	return matches.size();
 }
 
 void FrameProcessor::frame_safeLock() {

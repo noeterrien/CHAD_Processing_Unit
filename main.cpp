@@ -101,7 +101,7 @@ int main()
 
             // compute translation from reference frame
             if (fp_ref != 0) {
-                FrameProcessor::computeTranslation(*fp_ref, *fp, dx, dy, dz, m_kp_num);
+                m_kp_num = FrameProcessor::computeTranslation(*fp_ref, *fp, dx, dy, dz);
             }
 
             // send the result to ROV
