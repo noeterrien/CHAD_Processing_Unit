@@ -1,8 +1,10 @@
-#include <Camera.hpp>
-#include <FrameProcessor.hpp>
+////////////////////////////////////////////////////////   IMPORTS   ///////////////////////////////////////////////////////////
+
+#include <Camera.hpp> // a library to read frames from a given source (either camera or video)
+#include <FrameProcessor.hpp> // main module, used to compute keypoints and translation between a given frame and the reference frame
 #include "utilitaries.cpp"
-#include <Interface.hpp>
-#include <Parameters.hpp>
+#include <Interface.hpp> // module used to handle web communications (includes frame processing display, sending data via udp and http requests handler)
+#include <Parameters.hpp> // loads and parses parameters from config file
 
 #include <mutex>
 #include <opencv2/opencv.hpp>
@@ -21,7 +23,6 @@ int main()
     // Camera Initialization
     cv::Mat *frame_cam1 = new cv::Mat(); // a pointer indicating where frames from cam1 should be stored to be accessed by other instances
     std::mutex *lock_frame_cam1 = new std::mutex(); // a mutex used to lock the previous pointer so that two thread don't try to access it at the same time
-    //std::string source("tests/test_video.mp4");
     Camera cam1(params.source, frame_cam1, lock_frame_cam1);
     cam1.start();
 
@@ -38,21 +39,35 @@ int main()
 
     // this to ROV interface initialization
     float dx(0), dy(0), dz(0);
+    int kp_num(0), m_kp_num(0); // kp_num = number of keypoints in last processed frame
+                                  // m_kp_num = number of matched keypoints between last processed frame and reference frame
     Sender this_to_ROV(params.rov_ip, 1106);
 
     // http requests handling interface initialization
-    HTTPServer incoming_requests_handler;
-    incoming_requests_handler.Post("/reset_reference_frame", [&](const httplib::Request& req, httplib::Response& res){ // define reset_reference_frame post request
+    HTTPServer http_requests_handler;
+    http_requests_handler.set_default_headers({
+        {"Access-Control-Allow-Origin", "*"}, // if you know from which address you want to access it, safer to replace "*" with "your_adress"
+        {"Access-Control-Allow-Methods", "GET, POST, OPTIONS"},
+        {"Access-Control-Allow-Headers", "Content-Type"}
+    });
+    http_requests_handler.Post("/reset_reference_frame", [&](const httplib::Request& req, httplib::Response& res){ // define reset_reference_frame post request
         if (fp_ref != 0) {
             std::lock_guard<std::mutex> guard(lock_reference_frame_processor);
             delete fp_ref;
             fp_ref = 0;
             std::cout << "Deleted reference frame" << std::endl;
         }
-        res.set_header("Access-Control-Allow-Origin", "*");
         res.set_content("Reference frame reset", "text/plain");
     });
-    incoming_requests_handler.start(8000); // listen from all IPs on port 8080
+    http_requests_handler.Get("/status/:param_id", [&](const httplib::Request& req, httplib::Response& res){
+        auto param_id = req.path_params.at("param_id");
+        if (param_id == "dx") res.set_content(to_string(dx), "text/plain");
+        if (param_id == "dy") res.set_content(to_string(dy), "text/plain");
+        if (param_id == "dz") res.set_content(to_string(dz), "text/plain");
+        if (param_id == "kp_num") res.set_content(to_string(kp_num), "text/plain");
+        if (param_id == "m_kp_num") res.set_content(to_string(m_kp_num), "text/plain");
+    });
+    http_requests_handler.start(8000); // listen from all IPs on port 8000
 
     ////////////////////////////////////////////////////   PROCESSING   //////////////////////////////////////////////////////////
 
@@ -60,7 +75,6 @@ int main()
 
         if (cam1.is_new_frame_available())
         {
-            float dx(0), dy(0), dz(0);
             // extract new frame and display it
             {
                 // extract new frame  
@@ -68,7 +82,8 @@ int main()
                 cam1.set_new_frame_available_status(false);
                 fp = new FrameProcessor(frame_cam1, sift1, matcher1);
                 fp->computeKeypointsAndDescriptors();
-                std::cout << "number of keypoints : " << fp->get_numberOfKeypoints() << std::endl;
+                kp_num = fp->get_numberOfKeypoints();
+                std::cout << "number of keypoints : " << kp_num << std::endl;
         
                 // set reference frame
                 {
@@ -86,7 +101,7 @@ int main()
 
             // compute translation from reference frame
             if (fp_ref != 0) {
-                FrameProcessor::computeTranslation(*fp_ref, *fp, dx, dy, dz);
+                FrameProcessor::computeTranslation(*fp_ref, *fp, dx, dy, dz, m_kp_num);
             }
 
             // send the result to ROV

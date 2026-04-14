@@ -108,11 +108,12 @@ dx corresponds to the camera's horizontal axis, from left to right and dy to the
 dz is given in red channel intensity (between 0 and 255). If dz > 0, the camera got closer to the object in front (higher red intensity)
 Assumes changes of attitude to be negligeable.*/
 void FrameProcessor::computeTranslation(FrameProcessor fp1, FrameProcessor fp2, 
-										float &dx, float &dy, float &dz) {
+										float &dx, float &dy, float &dz, int &m_kp_num) {
 
 	// matching keypoints
 	std::vector<cv::DMatch> matches;
 	FrameProcessor::matchKeypoints(fp1, fp2, matches);
+	m_kp_num = matches.size();
 
 	// computing x, y translation by looking at median translation for each keypoint
 	std::vector<float> dxs, dys;

@@ -16,9 +16,9 @@ public:
 	void setMask(cv::Mat &_mask);
 	void computeKeypointsAndDescriptors();
 
-	static void computeTranslation(FrameProcessor fp1, FrameProcessor fp2, float &dx, float &dy, float &dz); /*fp1 and fp2 frames can be changed while 
-																											   translation is being computed, as long as keypoints
-																											   and descriptors have already been computed*/
+	static void computeTranslation(FrameProcessor fp1, FrameProcessor fp2, float &dx, float &dy, float &dz, int &m_kp_num); /*fp1 and fp2 frames can be changed while 
+																											   				translation is being computed, as long as keypoints
+																											   				and descriptors have already been computed*/
 	
 	// methods for debug
 	void frame_safeLock(); // copies the associated frame so that it cannot be modified by another thread (for DEBUG purposes)
