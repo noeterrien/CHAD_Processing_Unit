@@ -103,10 +103,10 @@ void FrameProcessor::matchKeypoints(FrameProcessor fp1, FrameProcessor fp2, std:
 
 }
 
-/*Computes the translation that must be applied to the camera to get fp2 frame from fp1 frame. dx and dz are expressed in pixels.
+/*Computes the translation that must be applied to the camera to get fp2 frame from fp1 frame. dx and dy are expressed in pixels.
 dx corresponds to the camera's horizontal axis, from left to right and dy to the camera's vertical axis from top to bottom.
 dz is given in red channel intensity (between 0 and 255). If dz > 0, the camera got closer to the object in front (higher red intensity)
-Assumes change of attitude to be negligeable.*/
+Assumes changes of attitude to be negligeable.*/
 void FrameProcessor::computeTranslation(FrameProcessor fp1, FrameProcessor fp2, 
 										float &dx, float &dy, float &dz) {
 

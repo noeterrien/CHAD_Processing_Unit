@@ -38,7 +38,7 @@ int main()
 
     // this to ROV interface initialization
     float dx(0), dy(0), dz(0);
-    Sender this_to_ROV(params.rov_ip, params.rov_send_port);
+    Sender this_to_ROV(params.rov_ip, 1106);
 
     // http requests handling interface initialization
     HTTPServer incoming_requests_handler;
@@ -52,7 +52,7 @@ int main()
         res.set_header("Access-Control-Allow-Origin", "*");
         res.set_content("Reference frame reset", "text/plain");
     });
-    incoming_requests_handler.start(params.cockpit_reset_reference_port); // listen from all IPs on port 8080
+    incoming_requests_handler.start(8000); // listen from all IPs on port 8080
 
     ////////////////////////////////////////////////////   PROCESSING   //////////////////////////////////////////////////////////
 
@@ -90,10 +90,15 @@ int main()
             }
 
             // send the result to ROV
-            this_to_ROV.sendVector(-dx*params.gainX, -dy*params.gainY, -dz*params.gainZ);
-            std::cout << "sent " << -dx*params.gainX << ", " << -dy*params.gainY << ", " << -dz*params.gainZ << std::endl;
+            this_to_ROV.sendVector(dx*params.gainX, dy*params.gainY, dz*params.gainZ);
+            std::cout << "sent " << dx*params.gainX << ", " << dy*params.gainY << ", " << dz*params.gainZ << std::endl;
         
             drawArrowFromOrigin(frame_with_keypoints, dx, dy);
+            cv::putText(frame_with_keypoints, "sent : " + std::to_string(dx*params.gainX) + ", " + std::to_string(dy*params.gainY) + ", " + std::to_string(dz*params.gainZ), 
+                        cv::Point(100, 500), 
+                        cv::FONT_HERSHEY_SIMPLEX,
+                        0.5,
+                        cv::Scalar(0, 255, 255));
             display.post(frame_with_keypoints);
 
             // delete pointer and set its address to 0
