@@ -23,6 +23,7 @@ public:
 	// methods for debug
 	void frame_safeLock(); // copies the associated frame so that it cannot be modified by another thread (for DEBUG purposes)
 	size_t get_numberOfKeypoints();
+	void get_frame(cv::Mat &output_frame); // if the frame is safe locked, returns the frame
 
 	// methods for display
 	void drawKeypoints(cv::Mat &outFrame);

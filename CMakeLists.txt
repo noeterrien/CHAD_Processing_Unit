@@ -18,25 +18,11 @@ target_compile_features(CPU
 target_link_libraries(CPU 
     PRIVATE 
         ${OpenCV_LIBS}
-        Display
         Camera
         FrameProcessor
         Interface  
         Parameters  
 )
-
-
-add_library(Display)
-target_sources(Display
-    PRIVATE
-        libraries/Display.cpp
-        
-    PUBLIC
-        FILE_SET HEADERS
-        BASE_DIRS 
-            libraries
-        FILES
-            libraries/Display.hpp)
 
             
 add_library(Camera)

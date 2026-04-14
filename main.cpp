@@ -1,4 +1,3 @@
-#include <Display.hpp>
 #include <Camera.hpp>
 #include <FrameProcessor.hpp>
 #include "utilitaries.cpp"

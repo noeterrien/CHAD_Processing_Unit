@@ -144,3 +144,11 @@ void FrameProcessor::frame_safeLock() {
 }
 
 size_t FrameProcessor::get_numberOfKeypoints() { return descriptors.total(); }
+
+void FrameProcessor::get_frame(cv::Mat &output_frame) {
+	if (frameCopied) {
+		frame->copyTo(output_frame);
+	} else {
+		std::cerr << "Frame not locked, cannot copy. Abort getting frame" << std::endl;
+	}
+}
