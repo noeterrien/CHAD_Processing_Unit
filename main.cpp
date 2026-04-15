@@ -42,6 +42,7 @@ int main()
     int kp_num(0), m_kp_num(0); // kp_num = number of keypoints in last processed frame
                                   // m_kp_num = number of matched keypoints between last processed frame and reference frame
     Sender this_to_ROV(params.get<std::string>("rov_ip"), params.get<int>("CHAD_sensor_port"));
+    std::cout << "Started CHAD sensor udp socket at " << params.get<std::string>("rov_ip") << ":" << params.get<int>("CHAD_sensor_port") << std::endl;
 
     // http requests handling interface initialization
     HTTPServer http_requests_handler;
@@ -67,7 +68,7 @@ int main()
         if (param_id == "kp_num") res.set_content(to_string(kp_num), "text/plain");
         if (param_id == "m_kp_num") res.set_content(to_string(m_kp_num), "text/plain");
     });
-    http_requests_handler.start(params.get<int>("http_request_handler_port")); // listen from all IPs on port 8000
+    http_requests_handler.start(params.get<int>("http_request_handler_port")); // listen from all IPs on given port
 
     ////////////////////////////////////////////////////   PROCESSING   //////////////////////////////////////////////////////////
 

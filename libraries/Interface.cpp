@@ -80,10 +80,9 @@ void Sender::sendVector(float x, float y, float z)
 
 void HTTPServer::start(uint16_t port, std::string address) {
     std::thread thread([=]{ 
-        std::cout << "starting http server on " << address << ":" << port << std::endl;
+        std::cout << "started http server at http://localhost:" << port << "/ waiting for incoming requests" << std::endl;
 
         int ret = listen(address, port);
     });
     thread.detach();
-    std::cout << "started HTTP server, waiting for incoming requests" << std::endl;
 }
