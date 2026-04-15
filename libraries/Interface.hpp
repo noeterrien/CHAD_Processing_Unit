@@ -1,6 +1,8 @@
 #ifndef DEF_INTERFACE
 #define DEF_INTERFACE
 
+#include <Parameters.hpp>
+
 #include <netinet/in.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
@@ -18,7 +20,7 @@ class Display
 {
 public :
 
-    Display(std::string path);
+    Display(std::string path, int port);
     void post(cv::Mat const& frame); // post a frame to the web display page
     void post_vmultiple(std::vector<cv::Mat> const& frames, int cv_type); // post multiple frames vertically. All frames are converted to cv_type 
     ~Display();

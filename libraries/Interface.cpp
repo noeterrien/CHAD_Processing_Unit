@@ -10,10 +10,10 @@
 #include <vector>
 #include <opencv2/opencv.hpp>
 
-Display::Display(std::string _path) {
-    streamer.start(8080);
+Display::Display(std::string _path, int port) {
+    streamer.start(port);
     path = _path;
-    std::cout << "Stream started. Visit http://localhost:8080/" << path << " to watch" << std::endl;
+    std::cout << "Stream started. Visit http://localhost:" << port << "/" << path << " to watch" << std::endl;
 }
 
 void Display::post(cv::Mat const& frame) {

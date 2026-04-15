@@ -1,24 +1,37 @@
 #ifndef DEF_PARAMETERS
 #define DEF_PARAMETERS
 
+#include <yaml-cpp/yaml.h>
 #include <string>
-#include <cstdint>
+#include <iostream>
 
-struct Parameters {
+class Parameters {
 
-    // constructor
-    Parameters(std::string path);
+public:
+    Parameters(std::string const path);
 
-    // parameters
-    std::string source;
-    std::string rov_ip;
-    uint8_t rov_send_port;
-    uint8_t cockpit_reset_reference_port;
-    
-    float gainX;
-    float gainY;
-    float gainZ;
+    template <typename T=std::string>
+    T get(std::string const parameter_name) const {
+        if (params_map[parameter_name]) {
+            return params_map[parameter_name].as<T>();
+        } else {
+            T default_value; 
+            std::cerr << "Unknown parameter : " << parameter_name << ", returning default value : " << default_value << std::endl;
+            return default_value;
+        }
+    }
 
+    template <typename T>
+    void set(std::string const parameter_name, T value) {
+        if (params_map[parameter_name]) {
+            params_map[parameter_name] = value;
+        } else {
+            std::cerr << "Unknown paramameter : " << parameter_name << ", could not assign value" << std::endl; 
+        }
+    }
+
+private:
+    YAML::Node params_map;
 };
 
 

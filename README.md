@@ -47,3 +47,13 @@ cmake ../
 make 
 sudo make install
 ```
+
+* <u> yaml-cpp :</u> This library is used to parse the configuration file
+```
+git clone https://github.com/jbeder/yaml-cpp.git
+cd yaml-cpp
+mkdir build && cd build
+cmake -DYAML_BUILD_SHARED_LIBS=on ..
+make 
+sudo make install
+```

@@ -5,6 +5,7 @@
 #include "utilitaries.cpp"
 #include <cmath>
 
+extern Parameters params;
 
 FrameProcessor::FrameProcessor(cv::Mat *_frame, 
 							   cv::Ptr<cv::SiftFeatureDetector> _sift, 
@@ -93,7 +94,7 @@ void FrameProcessor::matchKeypoints(FrameProcessor fp1, FrameProcessor fp2, std:
 
 	// filtering and adding matches to matches vector
 	for (int i=0; i<best_matches.size(); i++) {
-		if (best_matches[i][0].distance <  0.75 * best_matches[i][1].distance){
+		if (best_matches[i][0].distance <  params.get<float>("keep_match_threshold") * best_matches[i][1].distance){
 			
 			// If the 1st match is significantly (25%) better than the 2nd
 			matches.push_back(best_matches[i][0]);

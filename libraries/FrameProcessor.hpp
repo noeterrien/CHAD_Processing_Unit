@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Parameters.hpp>
 #include <opencv2/opencv.hpp>
 #include <vector>
 
@@ -44,4 +45,5 @@ private :
 	static void matchKeypoints(FrameProcessor fp1, FrameProcessor fp2, std::vector<cv::DMatch> &matches); // fp1 and fp2 frames can be changed during matching
 
 	bool frameCopied;
+
 };

@@ -2,11 +2,14 @@ cmake_minimum_required(VERSION 3.1)
 
 project(CPU)
 
+#######################################################    Dependencies    ########################################################
 find_package(OpenCV 4.2 REQUIRED)
 find_package(nadjieb_mjpeg_streamer REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 include_directories(${OpenCV_INCLUDE_DIRS})
 
+#######################################################    Executable    ########################################################
 add_executable(CPU)
 target_sources(CPU
     PRIVATE
@@ -24,7 +27,7 @@ target_link_libraries(CPU
         Parameters  
 )
 
-            
+#########################################################    Libraries    #########################################################
 add_library(Camera)
 target_sources(Camera
     PRIVATE
@@ -84,3 +87,4 @@ target_sources(Parameters
             libraries
         FILES
             libraries/Parameters.hpp)
+target_link_libraries(Parameters PUBLIC yaml-cpp::yaml-cpp)
