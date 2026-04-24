@@ -72,9 +72,9 @@ Sender::Sender(std::string ip_address, uint16_t port) {
 
 Sender::~Sender() { close(_socket); }
 
-void Sender::sendVector(float x, float y, float z)
+void Sender::sendVector(float x, float y, float z, float status)
 {   
-    float vector[3] = {x, y, z};
+    float vector[4] = {x, y, z, status};
     sendto(_socket, &vector, sizeof(vector), MSG_DONTWAIT, (const sockaddr*) &address, size);
 }
 

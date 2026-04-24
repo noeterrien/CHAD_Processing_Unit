@@ -1,7 +1,7 @@
 # communications
 ---
 #camera_source: tests/test_video.mp4
-camera_source: udpsrc port=5602 ! application/x-rtp,media=video,encoding-name=H264 !  rtph264depay ! avdec_h264 ! videoconvert ! appsink
+camera_source: udpsrc port=5600 ! application/x-rtp,media=video,encoding-name=H264 !  rtph264depay ! avdec_h264 ! videoconvert ! appsink
 rov_ip: 192.168.2.2
 CHAD_sensor_port: 1106
 http_request_handler_port: 8000
@@ -9,3 +9,4 @@ udp_display_port: 8080
 
 # default frame processor parameters
 keep_match_threshold: 0.75 # when matching keypoints, the match is kept if best match is keep_match_threshold times better than second best match
+dz_queue_size: 5

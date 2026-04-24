@@ -38,7 +38,7 @@ public:
     Sender(std::string ip_address, uint16_t port);
     ~Sender();
 
-    void sendVector(float x, float y, float z);
+    void sendVector(float x, float y, float z, float status); // status : 0 = fine , 1 = reference frame reset
 
 private:
     sockaddr_in address;

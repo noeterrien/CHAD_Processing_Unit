@@ -12,6 +12,7 @@
 #include <time.h>
 #include <string>
 #include <httplib.h>
+#include <queue>
 
 // Loading parameters as a global variable
 Parameters params("config.yaml");
@@ -31,6 +32,7 @@ int main()
     cv::Ptr<cv::DescriptorMatcher> matcher1 = cv::DescriptorMatcher::create(cv::DescriptorMatcher::BRUTEFORCE);
     FrameProcessor *fp_ref(0), *fp(0);
     std::mutex lock_reference_frame_processor;
+    bool reference_frame_reset = false;
 
     cv::Mat frame_with_keypoints;
 
@@ -39,6 +41,11 @@ int main()
 
     // this to ROV interface initialization
     float dx(0), dy(0), dz(0);
+    
+    std::queue<int> dz_queue; // using a queue to compute moving average for dz
+    uint dz_queue_size(params.get<uint>("dz_queue_size"));
+    float dz_queue_mean(0);
+
     int kp_num(0), m_kp_num(0); // kp_num = number of keypoints in last processed frame
                                   // m_kp_num = number of matched keypoints between last processed frame and reference frame
     Sender this_to_ROV(params.get<std::string>("rov_ip"), params.get<int>("CHAD_sensor_port"));
@@ -57,6 +64,11 @@ int main()
             delete fp_ref;
             fp_ref = 0;
             std::cout << "Deleted reference frame" << std::endl;
+
+            dz_queue_mean = 0;
+            dz_queue = std::queue<int>();
+
+            reference_frame_reset = true;
         }
         res.set_content("Reference frame reset", "text/plain");
     });
@@ -64,7 +76,7 @@ int main()
         auto param_id = req.path_params.at("param_id");
         if (param_id == "dx") res.set_content(to_string(dx), "text/plain");
         if (param_id == "dy") res.set_content(to_string(dy), "text/plain");
-        if (param_id == "dz") res.set_content(to_string(dz), "text/plain");
+        if (param_id == "dz") res.set_content(to_string(dz_queue_mean), "text/plain");
         if (param_id == "kp_num") res.set_content(to_string(kp_num), "text/plain");
         if (param_id == "m_kp_num") res.set_content(to_string(m_kp_num), "text/plain");
     });
@@ -103,14 +115,32 @@ int main()
             // compute translation from reference frame
             if (fp_ref != 0) {
                 m_kp_num = FrameProcessor::computeTranslation(*fp_ref, *fp, dx, dy, dz);
+                
+                dz_queue_mean *= dz_queue.size();
+
+                dz_queue.push(dz);
+                dz_queue_mean += dz;
+
+                while (dz_queue.size() > dz_queue_size) {
+                    int removed = dz_queue.front();
+                    dz_queue.pop();
+                    dz_queue_mean -= removed;
+                }
+
+                dz_queue_mean /= dz_queue.size();
             }
 
             // send the result to ROV
-            this_to_ROV.sendVector(dx, dy, dz);
-            // std::cout << "sent " << dx << ", " << dy << ", " << dz << std::endl;
+            if (reference_frame_reset) {
+                this_to_ROV.sendVector(dx, dy, dz_queue_mean, 1);
+                reference_frame_reset = false;
+            } else {
+                this_to_ROV.sendVector(dx, dy, dz_queue_mean, 0);
+            }
+            // std::cout << "sent " << dx << ", " << dy << ", " << dz_queue_mean << std::endl;
         
             drawArrowFromOrigin(frame_with_keypoints, dx, dy);
-            cv::putText(frame_with_keypoints, "sent : " + std::to_string(dx) + ", " + std::to_string(dy) + ", " + std::to_string(dz), 
+            cv::putText(frame_with_keypoints, "sent : " + std::to_string(dx) + ", " + std::to_string(dy) + ", " + std::to_string(dz_queue_mean), 
                         cv::Point(100, 500), 
                         cv::FONT_HERSHEY_SIMPLEX,
                         0.5,
