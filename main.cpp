@@ -17,6 +17,14 @@
 // Loading parameters as a global variable
 Parameters params("config.yaml");
 
+namespace Status {
+    enum Status {
+        AllGood,         // 0
+        RefFrameReset,   // 1
+        NotEnoughMatches // 2
+    };
+}
+
 int main()
 {
     ////////////////////////////////////////////////////   INITIALIZATION   ////////////////////////////////////////////////////
@@ -39,11 +47,22 @@ int main()
     // Display Initialization
     Display display("", params.get<int>("udp_display_port"));
 
+    // Minimal number of keypoint matches required
+    uint min_kpmatch_num(params.get<uint>("min_kpmatch_num"));
+
     // this to ROV interface initialization
     float dx(0), dy(0), dz(0);
     
-    std::queue<int> dz_queue; // using a queue to compute moving average for dz
+    std::queue<float> dx_queue;
+    std::queue<float> dy_queue;
+    std::queue<float> dz_queue; // using a queue to compute moving average for dz
+    
+    uint dx_queue_size(params.get<uint>("dx_queue_size"));
+    uint dy_queue_size(params.get<uint>("dy_queue_size"));
     uint dz_queue_size(params.get<uint>("dz_queue_size"));
+    
+    float dx_queue_mean(0);
+    float dy_queue_mean(0);
     float dz_queue_mean(0);
 
     int kp_num(0), m_kp_num(0); // kp_num = number of keypoints in last processed frame
@@ -64,9 +83,15 @@ int main()
             delete fp_ref;
             fp_ref = 0;
             std::cout << "Deleted reference frame" << std::endl;
-
+            
+            // Reset the queues used to calculate the sliding means
+            dx_queue_mean = 0;
+            dy_queue_mean = 0;
             dz_queue_mean = 0;
-            dz_queue = std::queue<int>();
+
+            dx_queue = std::queue<float>();
+            dy_queue = std::queue<float>();
+            dz_queue = std::queue<float>();
 
             reference_frame_reset = true;
         }
@@ -74,8 +99,8 @@ int main()
     });
     http_requests_handler.Get("/status/:param_id", [&](const httplib::Request& req, httplib::Response& res){
         auto param_id = req.path_params.at("param_id");
-        if (param_id == "dx") res.set_content(to_string(dx), "text/plain");
-        if (param_id == "dy") res.set_content(to_string(dy), "text/plain");
+        if (param_id == "dx") res.set_content(to_string(dx_queue_mean), "text/plain");
+        if (param_id == "dy") res.set_content(to_string(dy_queue_mean), "text/plain");
         if (param_id == "dz") res.set_content(to_string(dz_queue_mean), "text/plain");
         if (param_id == "kp_num") res.set_content(to_string(kp_num), "text/plain");
         if (param_id == "m_kp_num") res.set_content(to_string(m_kp_num), "text/plain");
@@ -115,32 +140,63 @@ int main()
             // compute translation from reference frame
             if (fp_ref != 0) {
                 m_kp_num = FrameProcessor::computeTranslation(*fp_ref, *fp, dx, dy, dz);
+
+
+                //////////// Calculate the sliding means ////////////
                 
+                dx_queue_mean *= dx_queue.size();
+                dy_queue_mean *= dy_queue.size();
                 dz_queue_mean *= dz_queue.size();
 
+
+                
+                dx_queue.push(dx);
+                dx_queue_mean += dx;
+                dy_queue.push(dy);
+                dy_queue_mean += dy;
                 dz_queue.push(dz);
                 dz_queue_mean += dz;
 
+
+
+                while (dx_queue.size() > dx_queue_size) {
+                    int removed = dx_queue.front();
+                    dx_queue.pop();
+                    dx_queue_mean -= removed;
+                }
+                while (dy_queue.size() > dy_queue_size) {
+                    int removed = dy_queue.front();
+                    dy_queue.pop();
+                    dy_queue_mean -= removed;
+                }
                 while (dz_queue.size() > dz_queue_size) {
                     int removed = dz_queue.front();
                     dz_queue.pop();
                     dz_queue_mean -= removed;
                 }
 
+
+
+                dx_queue_mean /= dx_queue.size();
+                dy_queue_mean /= dy_queue.size();
                 dz_queue_mean /= dz_queue.size();
             }
 
             // send the result to ROV
-            if (reference_frame_reset) {
-                this_to_ROV.sendVector(dx, dy, dz_queue_mean, 1);
+            
+            if (m_kp_num <= min_kpmatch_num) {
+                this_to_ROV.sendVector(dx_queue_mean, dy_queue_mean, dz_queue_mean, (float)Status::NotEnoughMatches );
+            }
+            else if (reference_frame_reset) {
+                this_to_ROV.sendVector(dx_queue_mean, dy_queue_mean, dz_queue_mean, (float)Status::RefFrameReset );
                 reference_frame_reset = false;
             } else {
-                this_to_ROV.sendVector(dx, dy, dz_queue_mean, 0);
+                this_to_ROV.sendVector(dx_queue_mean, dy_queue_mean, dz_queue_mean, (float)Status::AllGood );
             }
             // std::cout << "sent " << dx << ", " << dy << ", " << dz_queue_mean << std::endl;
         
-            drawArrowFromOrigin(frame_with_keypoints, dx, dy);
-            cv::putText(frame_with_keypoints, "sent : " + std::to_string(dx) + ", " + std::to_string(dy) + ", " + std::to_string(dz_queue_mean), 
+            drawArrowFromOrigin(frame_with_keypoints, dx_queue_mean, dy_queue_mean);
+            cv::putText(frame_with_keypoints, "sent : " + std::to_string(dx_queue_mean) + ", " + std::to_string(dy_queue_mean) + ", " + std::to_string(dz_queue_mean), 
                         cv::Point(100, 500), 
                         cv::FONT_HERSHEY_SIMPLEX,
                         0.5,
