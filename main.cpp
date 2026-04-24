@@ -185,7 +185,7 @@ int main()
             // send the result to ROV
             
             if (m_kp_num <= min_kpmatch_num) {
-                this_to_ROV.sendVector(dx_queue_mean, dy_queue_mean, dz_queue_mean, (float)Status::NotEnoughMatches );
+                this_to_ROV.sendVector(0, 0, 0, (float)Status::NotEnoughMatches );
             }
             else if (reference_frame_reset) {
                 this_to_ROV.sendVector(dx_queue_mean, dy_queue_mean, dz_queue_mean, (float)Status::RefFrameReset );
