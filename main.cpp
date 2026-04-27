@@ -97,6 +97,15 @@ int main()
         }
         res.set_content("Reference frame reset", "text/plain");
     });
+    http_requests_handler.Post("/set", [&](const httplib::Request& req, httplib::Response& res){ // define reset_reference_frame post request
+        
+        if (params.set(req.get_param_value("param_name"), req.get_param_value("param_value"))) {
+            res.set_content("parameter "+req.get_param_value("param_name")+" set to "+req.get_param_value("param_value")+"\n", "text/plain");
+        } else {
+            res.set_content("Unknown parameter : "+req.get_param_value("param_name")+"\n", "text/plain");
+        }
+
+    });
     http_requests_handler.Get("/status/:param_id", [&](const httplib::Request& req, httplib::Response& res){
         auto param_id = req.path_params.at("param_id");
         if (param_id == "dx") res.set_content(to_string(dx_queue_mean), "text/plain");

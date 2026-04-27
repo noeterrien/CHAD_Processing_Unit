@@ -22,11 +22,13 @@ public:
     }
 
     template <typename T>
-    void set(std::string const parameter_name, T value) {
+    bool set(std::string const parameter_name, T value) {
         if (params_map[parameter_name]) {
             params_map[parameter_name] = value;
+            return true;
         } else {
-            std::cerr << "Unknown paramameter : " << parameter_name << ", could not assign value" << std::endl; 
+            std::cerr << "Unknown paramameter : " << parameter_name << ", could not assign value" << std::endl;
+            return false; 
         }
     }
 
