@@ -53,9 +53,9 @@ int main()
     // this to ROV interface initialization
     float dx(0), dy(0), dz(0);
     
-    std::queue<float> dx_queue;
+    std::queue<float> dx_queue; // using queues to compute moving averages
     std::queue<float> dy_queue;
-    std::queue<float> dz_queue; // using a queue to compute moving average for dz
+    std::queue<float> dz_queue;
     
     uint dx_queue_size(params.get<uint>("dx_queue_size"));
     uint dy_queue_size(params.get<uint>("dy_queue_size"));
@@ -70,7 +70,7 @@ int main()
     Sender this_to_ROV(params.get<std::string>("rov_ip"), params.get<int>("CHAD_sensor_port"));
     std::cout << "Started CHAD sensor udp socket at " << params.get<std::string>("rov_ip") << ":" << params.get<int>("CHAD_sensor_port") << std::endl;
 
-    // http requests handling interface initialization
+    // http requests interface initialization
     HTTPServer http_requests_handler;
     http_requests_handler.set_default_headers({
         {"Access-Control-Allow-Origin", "*"}, // if you know from which address you want to access it, safer to replace "*" with "your_adress"
