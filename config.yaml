@@ -11,8 +11,8 @@ udp_display_port: 8080
 keep_match_threshold: 0.75 # when matching keypoints, the match is kept if best match is keep_match_threshold times better than second best match
 
 # queue sizes for the sliding mean
-dx_queue_size: 5 # 0.5s (f=10Hz)
-dy_queue_size: 5
+dx_queue_size: 20 # 0.5s (f=10Hz)
+dy_queue_size: 20
 dz_queue_size: 5
 
 # Minimum keypoint number
