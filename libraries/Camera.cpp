@@ -24,7 +24,19 @@ Camera::Camera(std::string src, cv::Mat *frame, std::mutex *lock_frame) : new_fr
 
 }
 
-void Camera::start()
+void Camera::start() {
+    if (stream_opened)
+    {
+        thread = std::thread(&Camera::run, this);
+           thread.detach();
+    } else
+    {
+        std::cerr << "Stream is not open. Cannot start fetching frames" << std::endl;
+        exit(EXIT_FAILURE);
+    }
+}
+
+void Camera::run()
 {
     cv::Mat frame_temp;
 	while (stream_opened) {

@@ -65,7 +65,7 @@ int main()
     float dy_queue_mean(0);
     float dz_queue_mean(0);
 
-    int kp_num(0), m_kp_num(0); // kp_num = number of keypoints in last processed frame
+    int kp_num(0), m_kp_num(0); // kp_num = number of keypoints in <'last processed frame
                                   // m_kp_num = number of matched keypoints between last processed frame and reference frame
     Sender this_to_ROV(params.get<std::string>("rov_ip"), params.get<int>("CHAD_sensor_port"));
     std::cout << "Started CHAD sensor udp socket at " << params.get<std::string>("rov_ip") << ":" << params.get<int>("CHAD_sensor_port") << std::endl;
