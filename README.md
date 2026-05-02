@@ -103,6 +103,13 @@ To start running the Camera, use the method ```start()```
 ### FrameProcessor
 This is where the magic happens. Instances of FrameProcessor take a pointer to a frame to be declared, as well as pointers to cv::SiftFeatureDetector and cv::DescriptorMatcher to be declared. This way, the frame can be modified by another thread (such as the Camera thread) before calling ```computeKeypointsAndDescriptors()``` method and static function ```computeTranslation``` to compute the translation between the current frame and the reference frame (given as another FrameProcessor object). When calling ```computeKeypointsAndDescriptors()```, the frame of the FrameProcessor should be locked using for instance a mutex and a lock_guard to ensure it is not modified during the process.
 
+The camera coordinates system is : 
+* x : horizontal axis, left to right
+* y : vertical axis, top to bottom
+* z : x $\wedge$ y
+
+The translation is computed using keypoints location in both frames for x and y (and thus the result is in pixels) while the intensity of the red channel is used for z information (thus not the same unit).
+
 Other convenient methods are provided in ```FrameProcessor.hpp```
 
 ### Interface 
