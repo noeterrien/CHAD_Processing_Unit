@@ -122,3 +122,11 @@ The Interface library provides objects to interact with the CPU and transmit inf
 The ```Parameters``` library is used to parse config from the ```config.yaml```, and store the parameters so that they can be modified while the program is runnning using, for insance, http requests.
 
 The ```utilitaries``` library is self explanatory.
+
+## TODO and possible avenues to explore
+
+* Segmentation faults can happen when reseting the reference frame or changing parameters while the CPU is running. Should be fixed using mutex and lock_guards.
+
+* Red channel only works when the luminosity comes mainly from the ROV lights. Other ways of computing depth should be explored.
+
+* Ideally, one would want to be able to compute rotation to apply and not only translation.
