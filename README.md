@@ -113,7 +113,7 @@ The translation is computed using keypoints location in both frames for x and y 
 Other convenient methods are provided in ```FrameProcessor.hpp```
 
 ### Interface 
-The Interface library provides objects to interact with the CPU and transmit informations to ardupilot.
+The Interface library provides objects to interact with the CPU and transmit information to ardupilot.
 * Display : used to display frames (cv::Mat) to a web page using http protocol.
 * Sender : used to send measurements to ardupilot using udp protocol.
 * HTTPServer : used to communicate with the CPU using http requests.
@@ -127,6 +127,6 @@ The ```utilitaries``` library is self explanatory.
 
 * Segmentation faults can happen when reseting the reference frame or changing parameters while the CPU is running. Should be fixed using mutex and lock_guards.
 
-* Red channel only works when the luminosity comes mainly from the ROV lights. Other ways of computing depth should be explored.
+* Red channel only works when the light comes mainly from the ROV lights. Other ways of computing depth should be explored.
 
 * Ideally, one would want to be able to compute rotation to apply and not only translation.
